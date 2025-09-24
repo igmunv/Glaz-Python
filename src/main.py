@@ -1,6 +1,14 @@
 import sys
+import string
 
 import loader
+
+LANG = 'ru'
+
+if LANG == 'en':
+    from dictionary_en import *
+elif LANG == 'ru':
+    from dictionary_ru import *
 
 modules = []
 
@@ -83,21 +91,31 @@ def module_run(module):
 
 def terminal_run():
     while (True):
+
         command = input(" > ")
 
-        if command == "help":
-            print("")
-        elif command == "exit":
-            print("Exit...")
-            sys.exit()
 
-        elif command == "modules":
+        if command in COMMANDS['help']['varieties']:
+            print()
+            print("| [*] All commands:")
+            for cmd in COMMANDS:
+                cmd_vars = ', '.join(COMMANDS[cmd]['varieties'])
+                print(f"| {cmd_vars} - {COMMANDS[cmd]['description']}")
+
+
+        elif command in COMMANDS['exit']['varieties']:
+            print("Exit...")
+            sys.exit(0)
+
+
+        elif command in COMMANDS['modules']['varieties']:
             print()
             print("| [*] All loaded modules:")
             for module in modules:
                 print(f"| {module}. '{modules[module].name}'")
             print()
             print("Enter the number to run module")
+
 
         elif command.isdigit():
             if int(command) not in modules:
@@ -109,7 +127,7 @@ def terminal_run():
 
         else:
             if len(command) > 0:
-                print("[!] Unknow command. Enter 'help' to view commands")
+                print(f"{DESIGNATION['error']} {TEXT['unknow_command']}")
 
 def main():
     global modules
