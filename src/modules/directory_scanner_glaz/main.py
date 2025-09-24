@@ -5,7 +5,7 @@ from http import client as httpcli
 from urllib.parse import quote
 
 class DirectoryScanner_Glaz(BaseModule):
-    name = "Directory Scanner (Glaz)"
+    name = "Directory Scanner"
     description = ""
     variables = {
         "host": {"description": "Hostname or IP address of target", "is_mandatory": True},

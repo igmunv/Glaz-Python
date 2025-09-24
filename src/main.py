@@ -114,10 +114,12 @@ def terminal_run():
 def main():
     global modules
     modules = loader.load_modules(1)
-    # terminal_run()
-    dictt = {'host': 'http://192.168.229.233/', 'port': None, 'wordlist': None, 'threads': None}
-    for module in modules:
-        ret = modules[module].run(dictt)
+    terminal_run()
+
+    # test
+    # dictt = {'host': 'http://192.168.229.233/', 'port': None, 'wordlist': None, 'threads': None}
+    # for module in modules:
+    #     ret = modules[module].run(dictt)
 
 
 
