@@ -7,10 +7,12 @@ def load_modules(log=0):
     modules_num = 0
     modules = {}
 
-    files = os.listdir("modules")
+    glaz_dir = os.path.dirname(os.path.abspath(__file__))
+
+    files = os.listdir(f"{glaz_dir}/modules")
     module_dirs = []
     for file in files:
-        if os.path.isdir(f"modules/{file}"):
+        if os.path.isdir(f"{glaz_dir}/modules/{file}"):
             module_dirs.append(file)
 
     for module_dir in module_dirs:

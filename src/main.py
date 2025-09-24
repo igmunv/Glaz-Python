@@ -1,14 +1,12 @@
 import sys
-import string
+import os
+import importlib
 
 import loader
 
-LANG = 'ru'
-
-if LANG == 'en':
-    from dictionary_en import *
-elif LANG == 'ru':
-    from dictionary_ru import *
+glaz_dir = os.path.dirname(os.path.abspath(__file__))
+LANG = open(f"{glaz_dir}/dicts/language", encoding="utf-8").read().strip()
+lang_module_name = f"dicts.dictionary_{LANG}"
 
 modules = []
 
@@ -92,7 +90,7 @@ def module_run(module):
 def terminal_run():
     while (True):
 
-        command = input(" > ")
+        command = input(" > ").strip()
 
 
         if command in COMMANDS['help']['varieties']:
@@ -134,12 +132,7 @@ def main():
     modules = loader.load_modules(1)
     terminal_run()
 
-    # test
-    # dictt = {'host': 'http://192.168.229.233/', 'port': None, 'wordlist': None, 'threads': None}
-    # for module in modules:
-    #     ret = modules[module].run(dictt)
-
-
-
 if __name__ == "__main__":
-        main()
+    mod = importlib.import_module(lang_module_name)
+    globals().update(vars(mod))
+    main()
