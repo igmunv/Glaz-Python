@@ -20,7 +20,7 @@ def load_language():
         sys.exit(-1)
 
 
-def collect(tag, data=None, skip_top=0, skip_down=0, skip_between_lines=0, is_launcher=False):
+def collect(command, data=None, skip_top=0, skip_down=0, skip_between_lines=0, is_launcher=False):
 
     # Load text and language
     load_language()
@@ -33,10 +33,24 @@ def collect(tag, data=None, skip_top=0, skip_down=0, skip_between_lines=0, is_la
     if skip_down:
         skip_down_text = "\n" * skip_down
 
+    # Top skip
     print(skip_top_text,end='')
 
-    # Unknow command
+    # Check and get tag of command
+    tag = command
     if tag not in COMMANDS_HANDLER and tag not in LAUNCHER_COMMANDS_HANDLER:
+        if is_launcher:
+            for cmd in LAUNCHER_COMMANDS:
+                if command in LAUNCHER_COMMANDS[cmd]:
+                    tag = cmd
+        else:
+            for cmd in COMMANDS:
+                if command in COMMANDS[cmd]:
+                    tag = cmd
+
+
+    # Unknow command
+    if tag not in ALL_TAGS:
         handler = COMMANDS_HANDLER['unknow_command']
         print(handler(lang_lib))
 
@@ -53,4 +67,5 @@ def collect(tag, data=None, skip_top=0, skip_down=0, skip_between_lines=0, is_la
             handler = COMMANDS_HANDLER[tag]
             print(handler(lang_lib, data=data))
 
+    # Down skip
     print(skip_down_text,end='')

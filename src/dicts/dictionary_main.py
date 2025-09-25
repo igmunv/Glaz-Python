@@ -18,6 +18,7 @@ COMMANDS_HANDLER = {
     "modules": H.modules,
     "unknow_command": H.unknow_command,
     "unknow_module": H.unknow_module,
+    "module_load": H.module_load,
 }
 
 LAUNCHER_COMMANDS_HANDLER = {
@@ -27,12 +28,17 @@ LAUNCHER_COMMANDS_HANDLER = {
     "mod_error": H.module_error,
     "var_is_n_found": H.variable_is_not_found,
     "var_is_mand": H.variable_is_mandatory,
+    "mod_finish": H.module_finish,
 }
 
 DESIGNATIONS = {
     "error": "[!]",
     "info": "[*]",
+    "add": "[+]",
     "success": "[v]",
     "border": "|",
     "input": " > ",
 }
+
+
+ALL_TAGS = list(COMMANDS_HANDLER.keys())+ list(LAUNCHER_COMMANDS_HANDLER.keys())

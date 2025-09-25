@@ -6,7 +6,7 @@ class IPAddressScanner_Glaz(BaseModule):
     name = "IP Address Scanner"
     description = ""
     usage = "Usage"
-    variables = {"range": {"description": "Scanned IP Address Range", "is_mandatory": True}} # MANDATORY !!!
+    variables = {"range": {"description": "Scanned IP Address Range", "is_required": True}} # MANDATORY !!!
 
     def run(self, VAR_VALUE_DICT):
         # переменные, которые указаны в словаре variables, и их значения

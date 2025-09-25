@@ -8,10 +8,10 @@ class DirectoryScanner_Glaz(BaseModule):
     name = "Directory Scanner"
     description = ""
     variables = {
-        "host": {"description": "Hostname or IP address of target", "is_mandatory": True},
-        "port": {"description": "Port", "is_mandatory": False},
-        "wordlist": {"description": "Path to wordlist", "is_mandatory": False},
-        "threads": {"description": "", "is_mandatory": False}
+        "host": {"description": "Hostname or IP address of target", "is_required": True},
+        "port": {"description": "Port", "is_required": False},
+        "wordlist": {"description": "Path to wordlist", "is_required": False},
+        "threads": {"description": "", "is_required": False}
         }
 
 

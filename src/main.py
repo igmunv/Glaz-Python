@@ -6,71 +6,89 @@ from dicts.str_collector import *
 from dicts.dictionary_main import *
 
 
+# Modules are stored
 modules = []
 
 
+# Module Launcher
 def launcher(module):
 
+    # Variables for module
     VAR_VALUE = {}
 
     while True:
 
+        # User Input
         var_value_input = input(f"{module.name}{DESIGNATIONS['input']}").strip()
 
+        # Empty: re-input
         if not var_value_input:
             continue
 
+        # Split: var and value (for variables)
         var_value = var_value_input.split()
 
-        # Help
-        if var_value[0] == "help":
-            collect(var_value[0], data=module, skip_top=1, is_launcher=True)
+        # Help: Output all commands and module variables
+        if var_value_input in LAUNCHER_COMMANDS['help']:
+            collect(var_value_input, data=module, skip_top=1, is_launcher=True)
 
-        # Exit
-        elif var_value[0] == "exit":
+        # Exit: back to Glaz
+        elif var_value_input in LAUNCHER_COMMANDS['exit']:
             collect("exit", is_launcher=True)
             return
 
-        elif  var_value[0] == "run":
+        # Run: run module
+        elif var_value_input in LAUNCHER_COMMANDS['run']:
 
-            # проверка на обязательную переменную
+            # Check: var is required?
             is_mandatory_check_flag = False
             for var in module.variables:
-                if module.variables[var]['is_mandatory'] and var not in VAR_VALUE:
+                if module.variables[var]['is_required'] and var not in VAR_VALUE:
                     collect("var_is_mand", data=var, is_launcher=True)
                     is_mandatory_check_flag = True
             if is_mandatory_check_flag:
                 continue
 
-            # присваивание None если переменной не присвоили значение
-
+            # If user not set value for variable: variable value = None
             for var in module.variables:
                 if var not in VAR_VALUE:
                     VAR_VALUE[var] = None
 
-            break
+            # Run
+            module_return = module.run(VAR_VALUE)
 
+            # Finish
+            collect("mod_finish", is_launcher=True)
+
+            # Module error
+            if module_return == -1:
+                collect("mod_error", is_launcher=True)
+                return -1
+
+            break;
+
+        # If user set value for var
         elif len(var_value) == 2:
+
             var = var_value[0]
             value = var_value[1]
+
             if var in module.variables:
-                # все значения которые передаются в модуль являются типом string
-                VAR_VALUE[var] = value
+                VAR_VALUE[var] = value  # Type values for module: string
             else:
                 collect("var_is_n_found", is_launcher=True)
 
+        # Unknow command
         else:
             collect("val_of_var_n_found", is_launcher=True)
 
-    ret = module.run(VAR_VALUE)
-    if ret == -1:
-        collect("mod_error", is_launcher=True)
-        return -1
+    collect("exit", is_launcher=True)
 
-
-def terminal_run():
+# Main Terminal
+def terminal():
     while (True):
 
+        # User Input
         command = input(f"{DESIGNATIONS['input']}").strip()
 
         # Empty: re-input
@@ -111,10 +129,10 @@ def main():
 
     # Load modules
     global modules
-    modules = loader.load_modules(1)
+    modules = loader.load_modules()
 
     # Run terminal
-    terminal_run()
+    terminal()
 
 
 if __name__ == "__main__":
