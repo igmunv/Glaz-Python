@@ -1,138 +1,121 @@
 import sys
 import os
-import importlib
 
 import loader
+from dicts.str_collector import *
+from dicts.dictionary_main import *
 
-glaz_dir = os.path.dirname(os.path.abspath(__file__))
-LANG = open(f"{glaz_dir}/dicts/language", encoding="utf-8").read().strip()
-lang_module_name = f"dicts.dictionary_{LANG}"
 
 modules = []
 
-def module_run(module):
-    print()
-    print(f"{module.name}")
-    print(f"{module.description}")
 
-    # print("| variable: description")
-    # print("| All variables:")
-
-    mandatory_variables = {}
-    optional_variables = {}
-    for var in module.variables:
-        if module.variables[var]['is_mandatory']:
-            mandatory_variables[var] = module.variables[var]
-        else:
-            optional_variables[var] = module.variables[var]
-
-    print("| [*] Mandatory variables:")
-    for var in mandatory_variables:
-        print(f"| {var}: MANDATORY : {module.variables[var]['description']}")
-    print("|")
-    print("| [*] Optional variables:")
-    for var in optional_variables:
-        print(f"| {var}: OPTIONAL : {module.variables[var]['description']}")
-
-    print("Enter 'VARIABLE VALUE' to assign a value to a variable. Example: 'host http://192.168.0.1/'")
-    print("")
-    print("Enter 'exit' for back to Glaz")
-    print("Enter 'run' for run module")
+def launcher(module):
 
     VAR_VALUE = {}
 
-
     while True:
-        var_value_input = input(f"{module.name} > ")
 
-        if len(var_value_input) > 0:
-            var_value = var_value_input.split()
+        var_value_input = input(f"{module.name}{DESIGNATIONS['input']}").strip()
 
-            if var_value[0] == "exit":
-                print("Back to Glaz...")
-                return
-            if  var_value[0] == "run":
+        if not var_value_input:
+            continue
 
-                # проверка на обязательную переменную
-                is_mandatory_check_flag = False
-                for var in module.variables:
-                    if module.variables[var]['is_mandatory'] and var not in VAR_VALUE:
-                        print(f"[!] Variable '{var}' is mandatory!")
-                        is_mandatory_check_flag = True
-                if is_mandatory_check_flag:
-                    continue
+        var_value = var_value_input.split()
 
-                # присваивание None если переменной не присвоили значение
+        # Help
+        if var_value[0] == "help":
+            collect(var_value[0], data=module, skip_top=1, is_launcher=True)
 
-                for var in module.variables:
-                    if var not in VAR_VALUE:
-                        VAR_VALUE[var] = None
+        # Exit
+        elif var_value[0] == "exit":
+            collect("exit", is_launcher=True)
+            return
 
-                break
+        elif  var_value[0] == "run":
 
-            if len(var_value) == 2:
-                var = var_value[0]
-                value = var_value[1]
-                if var in module.variables:
-                    # все значения которые передаются в модуль являются типом string
-                    VAR_VALUE[var] = value
-                else:
-                    print('[!] Variable is not found!')
+            # проверка на обязательную переменную
+            is_mandatory_check_flag = False
+            for var in module.variables:
+                if module.variables[var]['is_mandatory'] and var not in VAR_VALUE:
+                    collect("var_is_mand", data=var, is_launcher=True)
+                    is_mandatory_check_flag = True
+            if is_mandatory_check_flag:
+                continue
 
+            # присваивание None если переменной не присвоили значение
+
+            for var in module.variables:
+                if var not in VAR_VALUE:
+                    VAR_VALUE[var] = None
+
+            break
+
+        elif len(var_value) == 2:
+            var = var_value[0]
+            value = var_value[1]
+            if var in module.variables:
+                # все значения которые передаются в модуль являются типом string
+                VAR_VALUE[var] = value
             else:
-                print('[!] Enter value of variable!')
+                collect("var_is_n_found", is_launcher=True)
+
+        else:
+            collect("val_of_var_n_found", is_launcher=True)
 
     ret = module.run(VAR_VALUE)
     if ret == -1:
-        print("[!] Module error")
+        collect("mod_error", is_launcher=True)
         return -1
+
 
 def terminal_run():
     while (True):
 
-        command = input(" > ").strip()
+        command = input(f"{DESIGNATIONS['input']}").strip()
 
+        # Empty: re-input
+        if not command:
+            continue
 
-        if command in COMMANDS['help']['varieties']:
-            print()
-            print("| [*] All commands:")
-            for cmd in COMMANDS:
-                cmd_vars = ', '.join(COMMANDS[cmd]['varieties'])
-                print(f"| {cmd_vars} - {COMMANDS[cmd]['description']}")
+        # Help: Output all commands
+        if command in COMMANDS['help']:
+            collect(command, skip_top=1)
 
-
-        elif command in COMMANDS['exit']['varieties']:
-            print("Exit...")
+        # Exit: Exit from Glaz
+        elif command in COMMANDS['exit']:
+            collect(command)
             sys.exit(0)
 
+        # Modules: Output all loaded modules
+        elif command in COMMANDS['modules']:
+            collect(command, data=modules, skip_top=1)
 
-        elif command in COMMANDS['modules']['varieties']:
-            print()
-            print("| [*] All loaded modules:")
-            for module in modules:
-                print(f"| {module}. '{modules[module].name}'")
-            print()
-            print("Enter the number to run module")
-
-
+        # Number: Run launcher for selected module
         elif command.isdigit():
+
+            # Module is not found
             if int(command) not in modules:
-                print("Модуль с таким номером не загружен. Чтобы посмотреть загруженные модули введите 'module'")
+                collect("unknow_module")
+
+            # Run launcher
             else:
                 module = modules[int(command)]
-                module_run(module)
+                launcher(module)
 
-
+        # Other: Unknow command
         else:
-            if len(command) > 0:
-                print(f"{DESIGNATION['error']} {TEXT['unknow_command']}")
+            collect(command)
+
 
 def main():
+
+    # Load modules
     global modules
     modules = loader.load_modules(1)
+
+    # Run terminal
     terminal_run()
 
+
 if __name__ == "__main__":
-    mod = importlib.import_module(lang_module_name)
-    globals().update(vars(mod))
     main()
