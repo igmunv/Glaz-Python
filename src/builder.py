@@ -2,17 +2,20 @@ import os
 import sys
 
 
+# Check GCC
 def gcc_is_exists():
 
-    check = os.system("which gcc")
+    check = os.system("which gcc > /dev/null 2>&1")
     if check == 0:
         return True
     else:
         return False
 
 
+# Build module C files
 def build(main_class, modules_path, module_dir, is_build_path):
 
+    # Check GCC
     if not gcc_is_exists():
         print("[!] Please, install the GCC compiler!")
         sys.exit(-1)
@@ -41,12 +44,13 @@ def build(main_class, modules_path, module_dir, is_build_path):
 
         response_code = os.system(f"gcc -w -o {full_path_output_file} {full_path_input_file}")
 
+        # GCC success compilated file
         if response_code == 0:
             print(f"[v] Success: '{module_output_file}'")
 
             # Create a flag file to indicate that the module's dependencies have been collected
             with open(is_build_path, "w") as f:
                 pass
-
+        # GCC error
         else:
             print(f"[x] Fail: '{module_output_file}'")
