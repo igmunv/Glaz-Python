@@ -147,6 +147,7 @@ def main():
     # Check Root
     if not is_root():
         print(f"[!] Superuser permissions are required!")
+        sys.exit(-1)
 
     # Load modules
     global modules
