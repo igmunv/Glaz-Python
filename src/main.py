@@ -9,6 +9,13 @@ from command_handlers import *
 modules = []
 
 
+# Check: this user is root?
+def is_root():
+    if os.geteuid() == 0:
+        return True
+    return False
+
+
 # Check: this OS is Linux?
 def is_linux():
     if os.name == 'posix':
@@ -136,6 +143,10 @@ def main():
     if not is_linux():
         print(f"[!] Glaz can only work on Linux systems!")
         sys.exit(-1)
+
+    # Check Root
+    if not is_root():
+        print(f"[!] Superuser permissions are required!")
 
     # Load modules
     global modules
