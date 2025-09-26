@@ -9,6 +9,13 @@ from command_handlers import *
 modules = []
 
 
+# Check: this OS is Linux?
+def is_linux():
+    if os.name == 'posix':
+        return True
+    return False
+
+
 # Module Launcher
 def launcher(module):
 
@@ -124,6 +131,11 @@ def terminal():
 
 
 def main():
+
+    # Check OS
+    if not is_linux():
+        print(f"[!] Glaz can only work on Linux systems!")
+        sys.exit(-1)
 
     # Load modules
     global modules
