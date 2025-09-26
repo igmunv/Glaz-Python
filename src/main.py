@@ -2,8 +2,7 @@ import sys
 import os
 
 import loader
-from dicts.str_collector import *
-from dicts.dictionary_main import *
+from command_handlers import *
 
 
 # Modules are stored
@@ -19,7 +18,7 @@ def launcher(module):
     while True:
 
         # User Input
-        var_value_input = input(f"{module.name}{DESIGNATIONS['input']}").strip()
+        var_value_input = input(f"{module.name} > ").strip()
 
         # Empty: re-input
         if not var_value_input:
@@ -30,12 +29,11 @@ def launcher(module):
 
         # Help: Output all commands and module variables
         if var_value_input in LAUNCHER_COMMANDS['help']:
-            collect(var_value_input, data=module, skip_top=1, is_launcher=True)
+            help_launcher_handler(module)
 
         # Exit: back to Glaz
         elif var_value_input in LAUNCHER_COMMANDS['exit']:
-            collect("exit", is_launcher=True)
-            return
+            break
 
         # Run: run module
         elif var_value_input in LAUNCHER_COMMANDS['run']:
@@ -44,7 +42,7 @@ def launcher(module):
             is_mandatory_check_flag = False
             for var in module.variables:
                 if module.variables[var]['is_required'] and var not in VAR_VALUE:
-                    collect("var_is_mand", data=var, is_launcher=True)
+                    print(f"Variable {var} is required!")
                     is_mandatory_check_flag = True
             if is_mandatory_check_flag:
                 continue
@@ -58,13 +56,14 @@ def launcher(module):
             module_return = module.run(VAR_VALUE)
 
             # Finish
-            collect("mod_finish", is_launcher=True)
+            print("[*] Module finished work")
 
             # Module error
             if module_return == -1:
-                collect("mod_error", is_launcher=True)
+                print("[!] Module error!")
                 return -1
 
+            # Exit from launcher
             break;
 
         # If user set value for var
@@ -76,20 +75,20 @@ def launcher(module):
             if var in module.variables:
                 VAR_VALUE[var] = value  # Type values for module: string
             else:
-                collect("var_is_n_found", is_launcher=True)
+                print("[!] Variable is not found!")
 
         # Unknow command
         else:
-            collect("val_of_var_n_found", is_launcher=True)
+            print(f"[!] Enter value of variable! Enter '{LAUNCHER_COMMANDS['help'][0]} to view commands and usage!")
 
-    collect("exit", is_launcher=True)
+    print("Back to Glaz...")
 
 # Main Terminal
 def terminal():
     while (True):
 
         # User Input
-        command = input(f"{DESIGNATIONS['input']}").strip()
+        command = input(f" > ").strip()
 
         # Empty: re-input
         if not command:
@@ -97,23 +96,22 @@ def terminal():
 
         # Help: Output all commands
         if command in COMMANDS['help']:
-            collect(command, skip_top=1)
+            help_terminal_handler()
 
         # Exit: Exit from Glaz
         elif command in COMMANDS['exit']:
-            collect(command)
-            sys.exit(0)
+            exit_terminal_handler()
 
         # Modules: Output all loaded modules
         elif command in COMMANDS['modules']:
-            collect(command, data=modules, skip_top=1)
+            modules_terminal_handler(modules)
 
         # Number: Run launcher for selected module
         elif command.isdigit():
 
             # Module is not found
             if int(command) not in modules:
-                collect("unknow_module")
+                print(f"A module with this number is not loaded! Type '{COMMANDS['modules'][0]}' to view the modules")
 
             # Run launcher
             else:
@@ -122,7 +120,7 @@ def terminal():
 
         # Other: Unknow command
         else:
-            collect(command)
+            print(f"Unknow command! Enter '{COMMANDS['help'][0]}' to view commands")
 
 
 def main():

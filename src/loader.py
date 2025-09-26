@@ -1,10 +1,8 @@
 import os
 import importlib
 import inspect
-from base import BaseModule
 
-from dicts.str_collector import *
-from dicts.dictionary_main import *
+from base import BaseModule
 
 
 # Modules Loader
@@ -33,9 +31,9 @@ def load_modules():
             # add module if contains Glaz Based Class (BaseModule in '/base.py' file)
             for name, obj in inspect.getmembers(module, inspect.isclass):
                 if issubclass(obj, BaseModule) and obj is not BaseModule:
-                    m = obj()
-                    modules[len(modules)+1] = m
-                    collect("module_load", data=m.name)
+                    main_class = obj()
+                    modules[len(modules)+1] = main_class
+                    print(f"[+] Module {main_class.name} loaded")
         except ModuleNotFoundError:
             pass
 
