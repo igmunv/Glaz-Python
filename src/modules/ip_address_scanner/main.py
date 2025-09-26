@@ -1,30 +1,66 @@
+import subprocess
+import os
+import ipaddress
+import time
+
 from base import BaseModule
 
-import subprocess, os, ipaddress
-
 class IPAddressScanner_Glaz(BaseModule):
-    name = "IP Address Scanner"
-    description = ""
-    usage = "Usage"
-    variables = {"range": {"description": "Scanned IP Address Range", "is_required": True}} # MANDATORY !!!
 
+    # Module information
+    name = "IP Address Scanner"
+    description = "IP Address Scanning"
+    variables = {"range": {"description": "Scanned IP Address Range", "is_required": True}}
+
+
+    # Main function
     def run(self, VAR_VALUE_DICT):
-        # переменные, которые указаны в словаре variables, и их значения
-        # передаются в модуль через переменную словарь VAR_VALUE_DICT
-        # все значения которые передаются в модуль через словарь VAR_VALUE_DICT являются типом string
+
+        # Get 'range' variable
         range_ = VAR_VALUE_DICT['range']
+
+        # Check CIDR
+        if "/" not in range_:
+            print(f"[!] CIDR is missing. The format should be 'ADDRESS/CIDR'. Example: 192.168.0.1/24")
+            return -1
+
+         # Check IP network
         try:
             ipaddress.ip_network(range_, strict=False)
         except ValueError:
             print(f"[!] '{range_}' does not appear to be an IPv4 network!")
             return -1
 
+        # Get network and broadcast address
         network_cidr = ipaddress.IPv4Network(range_, strict=False)
 
-        self.scan_all_ip_addr(network_cidr.network_address, network_cidr.broadcast_address)
+        # Start scan
+        self._scan_all_ip_addr(network_cidr.network_address, network_cidr.broadcast_address)
+
+        time.sleep(0.25) # For correct output
 
 
-    def run_ping_bin(self, ip_address):
+    # Scan all ip address in range and ping
+    def _scan_all_ip_addr(self, network_address, broadcast_address):
+        try:
+            network_obj = ipaddress.IPv4Network(f"{network_address}/" +
+                                            str(ipaddress.IPv4Address(broadcast_address).max_prefixlen -
+                                                (int(ipaddress.IPv4Address(broadcast_address)) -
+                                                    int(ipaddress.IPv4Address(network_address))).bit_length()))
+
+            for ip in network_obj.hosts():
+                self._run_bin(ip)
+
+        except ipaddress.AddressValueError as e:
+            print(f"[!] Invalid IP address or network format: {e}")
+            return []
+        except ValueError as e:
+            print(f"[!] Could not determine network from provided addresses: {e}")
+            return []
+
+
+    # Run scanner (bin)
+    def _run_bin(self, ip_address):
 
         binary_path = "/bin/scanner"
         full_binary_path = os.path.dirname(__file__) + binary_path
@@ -35,25 +71,4 @@ class IPAddressScanner_Glaz(BaseModule):
         proc.stdin.write(str(ip_address).encode("ascii"))
         proc.stdin.close()
         proc.wait
-
-
-    def scan_all_ip_addr(self, network_address, broadcast_address):
-        try:
-            network_obj = ipaddress.IPv4Network(f"{network_address}/" +
-                                            str(ipaddress.IPv4Address(broadcast_address).max_prefixlen -
-                                                (int(ipaddress.IPv4Address(broadcast_address)) -
-                                                    int(ipaddress.IPv4Address(network_address))).bit_length()))
-
-            for ip in network_obj.hosts():
-                self.run_ping_bin(ip)
-
-        except ipaddress.AddressValueError as e:
-            print(f"Error: Invalid IP address or network format: {e}")
-            return []
-        except ValueError as e:
-            print(f"Error: Could not determine network from provided addresses: {e}")
-            return []
-
-
-if __name__ == "__main__":
-    pass
+        time.sleep(0.05) # For correct output

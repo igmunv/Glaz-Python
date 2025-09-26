@@ -6,6 +6,7 @@ from commands import *
 # TERMINAL
 #
 
+# help
 def help_terminal_handler():
 
     print()
@@ -16,10 +17,12 @@ def help_terminal_handler():
         print(f"| {cmd_vars} - {DESC_COMMANDS[cmd]}")
     print()
 
+# exit
 def exit_terminal_handler():
     print("Exit...")
     sys.exit(0)
 
+# modules
 def modules_terminal_handler(modules):
 
     print()
@@ -31,15 +34,15 @@ def modules_terminal_handler(modules):
     print()
     print("Enter the number to run module")
 
-def isdigit_terminal_handler():
-    pass
-
-
 #
 # LAUNCHER
 #
 
+# help
 def help_launcher_handler(module):
+
+
+    # Commands block
 
     print()
 
@@ -52,6 +55,8 @@ def help_launcher_handler(module):
     print()
 
     print(f"| [v] {module.name}:")
+
+    # Variables block
 
     required_variables = {}
     optional_variables = {}

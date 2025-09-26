@@ -2,9 +2,11 @@ from base import BaseModule
 
 import os, time, threading
 from http import client as httpcli
-from urllib.parse import quote
+from urllib.parse import quote, urlparse
 
 class DirectoryScanner_Glaz(BaseModule):
+
+    # Module information
     name = "Directory Scanner"
     description = ""
     variables = {
@@ -19,12 +21,43 @@ class DirectoryScanner_Glaz(BaseModule):
     wordlist_size = 0
     find_paths = {}
 
+    # Splitting into chunks
     def chunked(self, data, n):
         k, m = divmod(len(data), n)
         result = [data[i * k + min(i, m):(i + 1) * k + min(i + 1, m)] for i in range(n)]
         return result
 
+    # Get all parts from url
+    def parse_url(url: str):
+        p = urlparse(url)
+        scheme = p.scheme
+        hostname = p.hostname
+        port = p.port
+        path = p.path or '/'
+        username = p.username
+        password = p.password
+        query = p.query
+        fragment = p.fragment
 
+        # If port = None then port = default
+        if port is None:
+            if scheme == 'http':
+                port = 80
+            elif scheme == 'https':
+                port = 443
+
+        return {
+            'scheme': scheme,
+            'hostname': hostname,
+            'port': port,
+            'path': path,
+            'username': username,
+            'password': password,
+            'query': query,
+            'fragment': fragment,
+        }
+
+    # Send get request
     def httpget(self, host, port, path):
         # headers = {"Host": host, "User-Agent": "Glaz"}
         conn = httpcli.HTTPConnection(host, port)
@@ -32,6 +65,7 @@ class DirectoryScanner_Glaz(BaseModule):
         response = conn.getresponse()
         return response
 
+    # Http scan
     def http_run(self, host, port, path, wordlist):
         global result_counter
         for word in wordlist:
@@ -65,6 +99,7 @@ class DirectoryScanner_Glaz(BaseModule):
             # print(f"[{response.status}] - {result_path}")
             # print(f"T: {end_time-start_time}")
 
+    #Main function
     def run(self, VAR_VALUE_DICT):
         host_path = VAR_VALUE_DICT['host']
         port = VAR_VALUE_DICT['port']
@@ -145,25 +180,11 @@ class DirectoryScanner_Glaz(BaseModule):
             print()
 
 
-
-
-
-
-
         elif protocol == 'https':
             if port == None:
                 port = 443
 
 
-
-
         else:
             print('[!] Unknown protocol')
             return -1
-
-
-
-
-
-
-
