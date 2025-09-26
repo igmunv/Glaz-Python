@@ -19,7 +19,5 @@ int main(int argc, char * argv[])
     int ping_result = ping(&ip_address_musor);
 
     if (ping_result == 0) printf("[+] %s\n", ip_address_musor);
-
-
     return 0;
 }

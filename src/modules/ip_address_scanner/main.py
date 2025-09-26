@@ -2,6 +2,7 @@ import subprocess
 import os
 import ipaddress
 import time
+import threading
 
 from base import BaseModule
 
@@ -42,6 +43,13 @@ class IPAddressScanner_Glaz(BaseModule):
         time.sleep(0.25) # For correct output
 
 
+    # Division into chunks
+    def _chunked(self, data, n):
+        k, m = divmod(len(data), n)
+        result = [data[i * k + min(i, m):(i + 1) * k + min(i + 1, m)] for i in range(n)]
+        return result
+
+
     # Scan all ip address in range and ping
     def _scan_all_ip_addr(self, network_address, broadcast_address):
         try:
@@ -50,8 +58,30 @@ class IPAddressScanner_Glaz(BaseModule):
                                                 (int(ipaddress.IPv4Address(broadcast_address)) -
                                                     int(ipaddress.IPv4Address(network_address))).bit_length()))
 
+            # ptr = 0
+            # total_result = network_obj.num_addresses
+
+            threads_num = 20
+
+            ip_addresses = []
+
+            print("[*] Calculating available addresses...")
             for ip in network_obj.hosts():
-                self._run_bin(ip)
+                ip_addresses.append(ip)
+
+            print("[*] Division into chunks...")
+            chunks = self._chunked(ip_addresses, threads_num)
+
+            print(f"[*] Scanning {len(ip_addresses)} addresses:")
+            start_time = time.time()
+            self._threads_start(chunks)
+            end_time = time.time()
+            print(f"[v] The scan is completed in {end_time-start_time} seconds")
+
+                # self._run_bin(ip)
+                # ptr+=1
+                # procent = int((ptr * 100) / total_result)
+                # print(f"{procent}% | {total_result} / {ptr}\r", end='', flush=True)
 
         except ipaddress.AddressValueError as e:
             print(f"[!] Invalid IP address or network format: {e}")
@@ -62,7 +92,7 @@ class IPAddressScanner_Glaz(BaseModule):
 
 
     # Run scanner (bin)
-    def _run_bin(self, ip_address):
+    def _run_bin(self, ip_address, ):
 
         binary_path = "/bin/scanner"
         full_binary_path = os.path.dirname(__file__) + binary_path
@@ -72,5 +102,25 @@ class IPAddressScanner_Glaz(BaseModule):
         )
         proc.stdin.write(str(ip_address).encode("ascii"))
         proc.stdin.close()
-        proc.wait
+        proc.wait()
+
         time.sleep(0.05) # For correct output
+
+
+    def _iterate_chunk(self, chunk):
+
+        for ip_address in chunk:
+            self._run_bin(ip_address)
+
+
+    def _threads_start(self, chunks):
+
+        threads = []
+        for chunk in chunks:
+
+            thread = threading.Thread(target=self._iterate_chunk, args=(chunk,))
+            threads.append(thread)
+            thread.start()
+
+        for thread in threads:
+            thread.join()

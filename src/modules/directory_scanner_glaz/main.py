@@ -169,6 +169,8 @@ class DirectoryScanner_Glaz(BaseModule):
             procent = 0
 
             while self.result_counter < len(wordlist):
+
+                # procent = (current_result * 100) / total_result
                 procent = int((self.result_counter*100) / self.wordlist_size)
 
                 print(f"{procent}% | {self.result_counter} / {self.wordlist_size}\r", end='', flush=True)
