@@ -9,7 +9,9 @@ class IPAddressScanner_Glaz(BaseModule):
 
     # Module information
     name = "IP Address Scanner"
-    description = "IP Address Scanning"
+    description = "IP address lookup"
+    build = True
+    build_sources = {"/scanner.c": "/bin/scanner"}
     variables = {"range": {"description": "Scanned IP Address Range", "is_required": True}}
 
 

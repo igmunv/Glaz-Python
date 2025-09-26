@@ -29,7 +29,7 @@ def modules_terminal_handler(modules):
     print(f"| [*] All loaded modules:")
 
     for module_num in modules:
-        print(f"| {module_num}. '{modules[module_num].name}'")
+        print(f"| {module_num}. '{modules[module_num].name}' - {modules[module_num].description}")
 
     print()
     print("Enter the number to run module")

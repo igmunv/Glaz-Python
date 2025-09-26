@@ -8,6 +8,8 @@
 
 [v] - Success
 
+[x] - Fail
+
 [+] - Add
 
 | - Border

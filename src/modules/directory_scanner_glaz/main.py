@@ -8,7 +8,7 @@ class DirectoryScanner_Glaz(BaseModule):
 
     # Module information
     name = "Directory Scanner"
-    description = ""
+    description = "Search for site directories"
     variables = {
         "host": {"description": "Hostname or IP address of target", "is_required": True},
         "port": {"description": "Port", "is_required": False},

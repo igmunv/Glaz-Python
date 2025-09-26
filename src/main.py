@@ -42,7 +42,7 @@ def launcher(module):
             is_mandatory_check_flag = False
             for var in module.variables:
                 if module.variables[var]['is_required'] and var not in VAR_VALUE:
-                    print(f"Variable {var} is required!")
+                    print(f"Variable '{var}' is required!")
                     is_mandatory_check_flag = True
             if is_mandatory_check_flag:
                 continue
