@@ -15,6 +15,12 @@ def build(main_class, modules_path, module_dir, is_build_path):
         full_path_input_file = f"{modules_path}/{module_input_file}"
         full_path_output_file = f"{modules_path}/{module_output_file}"
 
+        # Check exists output directory
+        output_directory = os.path.dirname(full_path_output_file)
+        if not os.path.exists(output_directory):
+            os.mkdir(output_directory)
+            print(f"[*] Make directory ''{output_directory}'")
+
         # Build with GCC
         print(f"[*] Compilation: {module_input_file}")
 
@@ -22,9 +28,10 @@ def build(main_class, modules_path, module_dir, is_build_path):
 
         if response_code == 0:
             print(f"[v] Success: {module_output_file}")
+
+            # Create a flag file to indicate that the module's dependencies have been collected
+            with open(is_build_path, "w") as f:
+                pass
+
         else:
             print(f"[x] Fail: {module_output_file}")
-
-    # Create a flag file to indicate that the module's dependencies have been collected
-    with open(is_build_path, "w") as f:
-        pass

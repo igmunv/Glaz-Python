@@ -39,12 +39,14 @@ class BaseModule:
     # Dictionary of main source files to be compiled.
     # Only top-level files should be listed here (their dependencies are included automatically).
     # Each entry is stored as {SOURCE_FILE: OUTPUT_EXECUTABLE_FILE}.
-    # The path is set relative to the module directory
+    # The path is set relative to the module directory;
+    # Please compile the files into the bin directory in your module directory;
 
     # Словарь основных файлов, которые нужно компилировать.
     # Здесь указываются только верхнеуровневые файлы (их зависимости подключаются автоматически).
     # Каждая запись имеет вид {SOURCE_FILE: OUTPUT_EXECUTABLE_FILE}.
-    # Путь задаётся относительно директории модуля
+    # Путь задаётся относительно директории модуля;
+    # Пожалуйста, компилируйте файлы в директорию bin в директории вашего модуля;
 
     build_sources = {"example.c": "example.a"}
 
